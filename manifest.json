@@ -1,0 +1,24 @@
+{
+  "name": "MI AGENDA 2.0 – Control de eventos",
+  "short_name": "MI AGENDA",
+  "description": "Agenda personal con detección de cruces y sincronización con Google Calendar.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fa",
+  "theme_color": "#14283f",
+  "lang": "es-PE",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

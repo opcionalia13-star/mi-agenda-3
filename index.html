@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14283f">
+<meta name="description" content="MI AGENDA 2.0: organiza eventos y detecta cruces con Google Calendar.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>MI AGENDA 2.0 – Control de eventos</title>
+<style>
+:root{--navy:#14283f;--blue:#2d6cdf;--sky:#eaf1ff;--bg:#f3f6fa;--card:#fff;--text:#182638;--muted:#66758a;--line:#e4eaf1;--red:#c83c4b;--redbg:#fff0f1;--green:#197a55;--greenbg:#e9f7f0;--amber:#a76510;--amberbg:#fff5e5;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{background:linear-gradient(135deg,var(--navy),#24496d);color:#fff;padding:22px 18px 26px;border-radius:0 0 26px 26px}.top-inner{max-width:1000px;margin:auto}.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{display:flex;align-items:center;gap:12px}.brand-icon{width:46px;height:46px;border-radius:14px;background:#fff;color:var(--navy);display:grid;place-items:center;font-size:25px;font-weight:900}.brand h1{font-size:21px;line-height:1.15;margin:0;letter-spacing:.3px}.sub{font-size:12px;color:#d8e5f2;margin-top:5px}.status-pill{font-size:11px;border:1px solid #ffffff50;border-radius:999px;padding:7px 10px;color:#e7f1ff;white-space:nowrap}.hello{margin-top:22px}.hello h2{font-size:24px;margin:0 0 5px}.hello p{font-size:13px;color:#d6e3ef;margin:0}
+main{max-width:1000px;margin:-10px auto 40px;padding:0 14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 12px;box-shadow:0 5px 18px #172c4410}.stat .num{font-size:24px;font-weight:800}.stat .label{font-size:11px;color:var(--muted);margin-top:3px}.stat .ico{font-size:17px}
+.tabs{display:flex;gap:7px;margin:18px 0 14px;background:#e7edf5;padding:5px;border-radius:14px}.tab{flex:1;border:0;background:transparent;padding:10px 6px;border-radius:10px;color:#53657a;font-size:13px;font-weight:700}.tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px #1c365015}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin-bottom:14px;box-shadow:0 5px 18px #172c4408}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}h3{font-size:16px;margin:0}.hint{font-size:12px;color:var(--muted);line-height:1.45}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;font-size:13px}.primary{background:var(--blue);color:#fff}.secondary{background:var(--sky);color:#1e55ad}.ghost{background:#f0f3f7;color:#42536a}.danger{background:var(--redbg);color:var(--red)}.small{padding:8px 10px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:700;color:#42536a}input,select,textarea{width:100%;border:1px solid #dbe3ed;border-radius:11px;padding:11px 12px;background:#fff;color:var(--text);outline:none}input:focus,select:focus,textarea:focus{border-color:#6b9af0;box-shadow:0 0 0 3px #2d6cdf18}textarea{min-height:75px;resize:vertical}.checkline{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.checkline input{width:auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.notice{padding:12px 13px;border-radius:12px;font-size:12px;line-height:1.5;margin:12px 0}.notice.warn{background:var(--amberbg);color:var(--amber);border:1px solid #f3dfbd}.notice.error{background:var(--redbg);color:var(--red);border:1px solid #f2cbd0}.notice.ok{background:var(--greenbg);color:var(--green);border:1px solid #c8ead9}.hidden{display:none!important}
+.event-list{display:flex;flex-direction:column;gap:9px}.event{border:1px solid var(--line);border-radius:14px;padding:13px;display:grid;grid-template-columns:5px 1fr;gap:11px}.event-bar{border-radius:8px;background:var(--blue)}.event-bar.personal{background:#8b5cf6}.event-bar.trabajo{background:#2d6cdf}.event-bar.reunion{background:#0e9b83}.event-bar.evento{background:#e18b2d}.event-bar.salud{background:#d75b82}.event-bar.otro{background:#718096}.event-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.event-title{font-size:14px;font-weight:800}.event-meta{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}.tag{display:inline-block;font-size:10px;font-weight:750;border-radius:999px;padding:4px 8px;background:#eef3f9;color:#53657a;margin-top:7px}.tag.google{background:#e9f7f0;color:#197a55}.tag.pending{background:#fff5e5;color:#a76510}.event-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:13px}.empty .big{font-size:28px;margin-bottom:8px}
+.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.month-title{font-weight:800}.weekdays,.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekdays div{text-align:center;font-size:10px;color:var(--muted);padding:7px 0;font-weight:700}.day{border:1px solid transparent;background:#f5f7fa;border-radius:10px;min-height:48px;padding:6px 2px;text-align:center;color:var(--text);font-size:12px;position:relative}.day.muted{opacity:.35}.day.today{border-color:var(--blue);font-weight:800}.day.selected{background:var(--sky);border-color:#9bbcf6;color:#174c9d}.dot{width:5px;height:5px;border-radius:50%;background:var(--blue);display:block;margin:4px auto 0}
+.settings-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.steps{padding-left:18px;margin:8px 0 0}.steps li{margin:5px 0}.link{color:#1e55ad;text-decoration:none;font-weight:700}.footer{text-align:center;color:#8290a2;font-size:10px;padding:8px 0 22px}
+@media(min-width:700px){.top{padding:28px 24px 34px}.hello h2{font-size:28px}main{padding:0 22px}.stats{gap:14px}.stat{padding:17px}.panel{padding:21px}.day{min-height:65px}.form-grid{grid-template-columns:repeat(3,1fr)}.field.full{grid-column:1/-1}}
+@media(max-width:420px){.status-pill{font-size:10px;padding:6px 8px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.stats{gap:7px}.stat{padding:11px 9px}.stat .num{font-size:21px}.tab{font-size:12px}.settings-grid{grid-template-columns:1fr}}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<header class="top"><div class="top-inner">
+  <div class="top-row">
+    <div class="brand"><div class="brand-icon">✓</div><div><h1>MI AGENDA 2.0</h1><div class="sub">CONTROL INTELIGENTE DE EVENTOS</div></div></div>
+    <div class="status-pill" id="googleStatus">● Google sin conectar</div>
+  </div>
+  <div class="hello"><h2>Que nada se te cruce.</h2><p>Consulta tu Google Calendar antes de confirmar cada compromiso.</p></div>
+</div></header>
+<main>
+<section class="stats">
+  <div class="stat"><div class="ico">📅</div><div class="num" id="statTotal">0</div><div class="label">Próximos eventos</div></div>
+  <div class="stat"><div class="ico">⏳</div><div class="num" id="statWeek">0</div><div class="label">Esta semana</div></div>
+  <div class="stat"><div class="ico">⚠️</div><div class="num" id="statConflicts">0</div><div class="label">Cruces en agenda</div></div>
+</section>
+<nav class="tabs">
+  <button class="tab active" data-tab="home">Resumen</button>
+  <button class="tab" data-tab="calendar">Calendario</button>
+  <button class="tab" data-tab="events">Mis eventos</button>
+  <button class="tab" data-tab="settings">Google</button>
+</nav>
+
+<section id="homeView">
+  <section class="panel">
+    <div class="panel-head"><div><h3 id="formHeading">＋ Registrar nuevo evento</h3><div class="hint">La aplicación comprobará los compromisos antes de guardar.</div></div></div>
+    <form id="eventForm">
+      <input type="hidden" id="eventId">
+      <div class="form-grid">
+        <div class="field full"><label for="title">Nombre del evento *</label><input id="title" required maxlength="90" placeholder="Ej. Reunión de trabajo"></div>
+        <div class="field"><label for="date">Fecha *</label><input id="date" type="date" required></div>
+        <div class="field"><label>Duración</label><label class="checkline"><input id="allDay" type="checkbox"> Evento de todo el día</label></div>
+        <div class="field hidden" id="allDayEndWrap"><label for="allDayEnd">Último día del evento</label><input id="allDayEnd" type="date"></div>
+        <div class="field"><label for="start">Hora de inicio *</label><input id="start" type="time" value="09:00" required></div>
+        <div class="field"><label for="end">Hora de término *</label><input id="end" type="time" value="10:00" required></div>
+        <div class="field"><label for="category">Categoría</label><select id="category"><option>Trabajo</option><option>Reunión</option><option>Evento</option><option>Personal</option><option>Salud</option><option>Otro</option></select></div>
+        <div class="field"><label for="reminder">Recordatorio Google</label><select id="reminder"><option value="10">10 minutos antes</option><option value="30">30 minutos antes</option><option value="60">1 hora antes</option><option value="1440" selected>1 día antes</option><option value="4320">3 días antes</option><option value="10080">1 semana antes</option></select></div>
+        <div class="field"><label for="location">Lugar</label><input id="location" maxlength="120" placeholder="Dirección o lugar"></div>
+        <div class="field full"><label for="notes">Notas adicionales</label><textarea id="notes" maxlength="800" placeholder="Personas, materiales, indicaciones..."></textarea></div>
+      </div>
+      <div id="conflictBox" class="notice error hidden"></div>
+      <div id="formInfo" class="notice warn hidden"></div>
+      <div class="actions"><button class="btn primary" type="submit" id="saveBtn">Guardar evento</button><button class="btn ghost hidden" type="button" id="cancelEdit">Cancelar edición</button><button class="btn secondary" type="button" id="clearForm">Limpiar</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><div><h3>Próximos compromisos</h3><div class="hint" id="lastSync">Conecta Google para consultar tus eventos existentes.</div></div><button class="btn ghost small" id="seeAll">Ver todos</button></div>
+    <div class="event-list" id="upcomingList"></div>
+  </section>
+</section>
+
+<section id="calendarView" class="hidden">
+  <section class="panel">
+    <div class="calendar-head"><button class="btn ghost small" id="prevMonth">‹</button><div class="month-title" id="monthTitle"></div><button class="btn ghost small" id="nextMonth">›</button></div>
+    <div class="weekdays"><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div>SÁB</div><div>DOM</div></div>
+    <div class="month-grid" id="monthGrid"></div>
+    <div class="hint" style="margin-top:12px">Los puntos azules indican fechas con compromisos. Toca un día para consultar sus eventos.</div>
+  </section>
+  <section class="panel"><div class="panel-head"><h3 id="selectedDateTitle">Eventos del día</h3></div><div class="event-list" id="dayList"></div></section>
+</section>
+
+<section id="eventsView" class="hidden">
+  <section class="panel"><div class="panel-head"><div><h3>Todos mis eventos</h3><div class="hint">Incluye los eventos importados de Google Calendar.</div></div></div>
+    <input class="search" id="searchBox" placeholder="Buscar por nombre, lugar o categoría..."><div class="event-list" id="allList"></div>
+  </section>
+</section>
+
+<section id="settingsView" class="hidden">
+  <section class="panel">
+    <div class="panel-head"><div><h3>Conectar Google Calendar</h3><div class="hint">Autoriza el acceso a los eventos de tu calendario principal.</div></div></div>
+    <div id="connectionNotice" class="notice warn">Para activar la sincronización, primero configura el ID de cliente de Google en esta sección.</div>
+    <div class="field"><label for="clientId">ID de cliente OAuth de Google</label><input id="clientId" placeholder="000000000000-xxxxxxxx.apps.googleusercontent.com" autocomplete="off"></div>
+    <div class="actions">
+      <button class="btn secondary" id="saveClient">Guardar ID</button>
+      <button class="btn primary" id="connectGoogle">Conectar con Google</button>
+      <button class="btn ghost" id="syncGoogle" disabled>Sincronizar ahora</button>
+      <button class="btn danger" id="disconnectGoogle" disabled>Desconectar</button>
+    </div>
+    <div class="hint" style="margin-top:10px">La aplicación solo solicita permiso para consultar y administrar eventos de Google Calendar. El token de acceso se mantiene en memoria y no se guarda en el almacenamiento local.</div>
+  </section>
+  <section class="panel">
+    <h3>Cómo activar la conexión</h3>
+    <ol class="steps">
+      <li>Abre <a class="link" href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> e inicia sesión con tu cuenta.</li>
+      <li>Crea un proyecto y, en <b>APIs y servicios → Biblioteca</b>, habilita <b>Google Calendar API</b>.</li>
+      <li>Configura la pantalla de consentimiento OAuth. Si está en modo de prueba, agrega tu correo como usuario de prueba.</li>
+      <li>En <b>Credenciales → Crear credenciales → ID de cliente OAuth</b>, selecciona <b>Aplicación web</b>.</li>
+      <li>En <b>Orígenes autorizados de JavaScript</b>, agrega el dominio HTTPS donde se publicará esta aplicación (solo el dominio, sin ruta).</li>
+      <li>Copia el ID de cliente que termina en <b>.apps.googleusercontent.com</b>, pégalo arriba y pulsa <b>Guardar ID</b>.</li>
+      <li>Pulsa <b>Conectar con Google</b> y acepta los permisos.</li>
+    </ol>
+    <div class="notice warn">No pegues aquí una contraseña ni el secreto de cliente. Esta aplicación necesita únicamente el ID de cliente OAuth. La conexión no funcionará abriendo el archivo directamente desde el teléfono: debe estar publicado en un sitio HTTPS.</div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><div><h3>Eventos pendientes</h3><div class="hint">Eventos que guardaste sin conexión a Google.</div></div><button class="btn secondary small" id="syncPending" disabled>Enviar pendientes</button></div>
+    <div id="pendingInfo" class="hint">No hay eventos pendientes.</div>
+  </section>
+</section>
+<div class="footer">MI AGENDA 2.0 · Zona horaria: Lima, Perú · Tus eventos se consultan desde Google Calendar.</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const TZ="America/Lima", API="https://www.googleapis.com/calendar/v3";
+const LOCAL_KEY="miAgendaV2Local", CACHE_KEY="miAgendaV2GoogleCache", CLIENT_KEY="miAgendaV2Client";
+let localEvents=readStore(LOCAL_KEY,[]);
+let googleEvents=readStore(CACHE_KEY,[]);
+let accessToken=null, tokenExpiresAt=0, tokenClient=null, selectedDate=new Date(), monthCursor=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+
+function readStore(k,fallback){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(fallback))}catch(e){return fallback}}
+function saveLocal(){localStorage.setItem(LOCAL_KEY,JSON.stringify(localEvents))}
+function saveCache(){localStorage.setItem(CACHE_KEY,JSON.stringify(googleEvents));localStorage.setItem("miAgendaV2LastSync",new Date().toISOString())}
+function pad(n){return String(n).padStart(2,"0")}
+function addDays(s,n){const [y,m,d]=s.split("-").map(Number);const dt=new Date(Date.UTC(y,m-1,d+n));return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth()+1)}-${pad(dt.getUTCDate())}`}
+function dayOffset(a,b){const [ay,am,ad]=a.split("-").map(Number),[by,bm,bd]=b.split("-").map(Number);return Math.round((Date.UTC(by,bm-1,bd)-Date.UTC(ay,am-1,ad))/86400000)}
+function partsLima(value){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(value));const o={};for(const p of parts)if(p.type!=="literal")o[p.type]=p.value;return o}
+function todayLima(){const p=partsLima(new Date());return `${p.year}-${p.month}-${p.day}`}
+function dateToText(s){return new Intl.DateTimeFormat("es-PE",{timeZone:TZ,weekday:"short",day:"2-digit",month:"short",year:"numeric"}).format(new Date(s+"T12:00:00-05:00"))}
+function localISO(date,time){return `${date}T${time}:00-05:00`}
+function fmtRange(e){if(e.allDay){return e.endDate&&e.endDate!==addDays(e.date,1)?`Todo el día · hasta ${dateToText(addDays(e.endDate,-1))}`:"Todo el día"}return `${e.start||"00:00"} – ${e.end||"23:59"}${e.endDate&&e.endDate!==e.date?" · termina "+dateToText(e.endDate):""}`}
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function isPast(e){const end=e.allDay?new Date((e.endDate||addDays(e.date,1))+"T00:00:00-05:00"):new Date(localISO(e.endDate||e.date,e.end||"23:59"));return end<=new Date()}
+function allEvents(){const remoteIds=new Set(googleEvents.map(e=>e.googleId));return [...googleEvents,...localEvents.filter(e=>!e.googleId||!remoteIds.has(e.googleId))].sort((a,b)=>(a.date+(a.start||"00:00")).localeCompare(b.date+(b.start||"00:00")))}
+function interval(e){if(e.allDay)return {s:new Date((e.date||"2000-01-01")+"T00:00:00-05:00").getTime(),e:new Date((e.endDate||addDays(e.date,1))+"T00:00:00-05:00").getTime()};return {s:new Date(localISO(e.date,e.start||"00:00")).getTime(),e:new Date(localISO(e.endDate||e.date,e.end||"23:59")).getTime()}}
+function overlaps(a,b){const x=interval(a),y=interval(b);return x.s<y.e&&x.e>y.s}
+function normalizeGoogle(g){
+  if(!g.start||!g.end||g.status==="cancelled")return null;
+  const allDay=!!g.start.date;
+  let date,start="00:00",end="23:59",endDate=null;
+  if(allDay){date=g.start.date;endDate=g.end.date}
+  else{const s=partsLima(g.start.dateTime),e=partsLima(g.end.dateTime);date=`${s.year}-${s.month}-${s.day}`;start=`${s.hour}:${s.minute}`;end=`${e.hour}:${e.minute}`;const endDay=`${e.year}-${e.month}-${e.day}`;endDate=endDay!==date?endDay:null;}
+  return {googleId:g.id,title:g.summary||"(Sin título)",date,start,end,endDate,allDay,category:g.extendedProperties?.private?.miAgendaCategory||"Google Calendar",location:g.location||"",notes:g.description||"",htmlLink:g.htmlLink||"",reminder:g.reminders?.overrides?.[0]?.minutes||1440,source:"google"};
+}
+function buildGoogleBody(e){
+  const body={summary:e.title,description:[e.category,e.notes].filter(Boolean).join("\n\n"),location:e.location||"",reminders:{useDefault:false,overrides:[{method:"popup",minutes:Number(e.reminder||1440)}]},extendedProperties:{private:{miAgendaCategory:e.category||"Otro"}}};
+  if(e.allDay){body.start={date:e.date};body.end={date:e.endDate||addDays(e.date,1)}}
+  else{body.start={dateTime:localISO(e.date,e.start),timeZone:TZ};body.end={dateTime:localISO(e.endDate||e.date,e.end),timeZone:TZ}}
+  return body;
+}
+function setStatus(connected){$("googleStatus").textContent=connected?"● Google conectado":"● Google sin conectar";$("syncGoogle").disabled=!connected;$("disconnectGoogle").disabled=!connected;$("syncPending").disabled=!connected;$("connectionNotice").className="notice "+(connected?"ok":"warn");$("connectionNotice").textContent=connected?"Tu Google Calendar está conectado. Puedes consultar, crear, modificar y eliminar eventos.":"Configura el ID OAuth y conecta tu cuenta para consultar los eventos reales de Google Calendar."}
+function updateLastSync(){const t=localStorage.getItem("miAgendaV2LastSync");$("lastSync").textContent=t?"Última sincronización: "+new Intl.DateTimeFormat("es-PE",{dateStyle:"short",timeStyle:"short",timeZone:TZ}).format(new Date(t))+(accessToken?" · datos conectados":" · copia guardada"):"Conecta Google para consultar tus eventos existentes."}
+function tokenRequest(promptValue="consent"){
+  return new Promise((resolve,reject)=>{
+    const clientId=localStorage.getItem(CLIENT_KEY)||"";
+    if(!clientId){reject(new Error("Primero guarda tu ID de cliente OAuth en la pestaña Google."));return}
+    if(!window.google?.accounts?.oauth2){reject(new Error("No se pudo cargar el servicio de inicio de sesión de Google. Revisa tu conexión a internet."));return}
+    tokenClient=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:"https://www.googleapis.com/auth/calendar.events",callback:(r)=>{
+      if(r.error){reject(new Error(r.error_description||r.error));return}
+      accessToken=r.access_token;tokenExpiresAt=Date.now()+(Number(r.expires_in||3600)*1000);resolve(accessToken);
+    },error_callback:(e)=>reject(new Error(e.message||"No se pudo iniciar sesión con Google."))});
+    tokenClient.requestAccessToken({prompt:promptValue});
+  });
+}
+async function apiRequest(path,options={}){
+  if(!accessToken||Date.now()>tokenExpiresAt-30000){accessToken=null;setStatus(false);throw new Error("La autorización de Google venció. Pulsa «Conectar con Google» nuevamente.");}
+  const res=await fetch(API+path,{...options,headers:{Authorization:"Bearer "+accessToken,"Content-Type":"application/json",...(options.headers||{})}});
+  const data=res.status===204?null:await res.json().catch(()=>null);
+  if(!res.ok){if(res.status===401){accessToken=null;setStatus(false)}throw new Error(data?.error?.message||`Google Calendar respondió con error ${res.status}.`)}
+  return data;
+}
+function queryTime(date,time="00:00"){return encodeURIComponent(new Date(localISO(date,time)).toISOString())}
+async function listGoogleRange(dateStart,dateEnd){
+  let token=null,all=[];
+  do{
+    const params=new URLSearchParams({singleEvents:"true",orderBy:"startTime",maxResults:"2500",timeMin:new Date(localISO(dateStart,"00:00")).toISOString(),timeMax:new Date(localISO(dateEnd,"00:00")).toISOString()});
+    if(token)params.set("pageToken",token);
+    const data=await apiRequest("/calendars/primary/events?"+params.toString());
+    all=all.concat((data.items||[]).map(normalizeGoogle).filter(Boolean));token=data.nextPageToken||null;
+  }while(token);
+  return all;
+}
+async function fetchGoogleDay(date){return await listGoogleRange(date,addDays(date,1))}
+async function refreshGoogleEvents(){
+  const start=addDays(todayLima(),-30),end=addDays(todayLima(),366);
+  googleEvents=await listGoogleRange(start,end);saveCache();updateLastSync();renderAll();return googleEvents;
+}
+async function connectGoogle(){
+  try{$("connectGoogle").disabled=true;$("connectGoogle").textContent="Conectando...";await tokenRequest("consent");setStatus(true);await refreshGoogleEvents();showMessage("Google Calendar conectado y sincronizado correctamente.","ok");}
+  catch(e){showMessage(e.message,"error");}
+  finally{$("connectGoogle").disabled=false;$("connectGoogle").textContent="Conectar con Google";}
+}
+function showMessage(msg,type="ok"){const el=$("formInfo");el.textContent=msg;el.className="notice "+type;el.classList.remove("hidden");if(!$("settingsView").classList.contains("hidden")){$("connectionNotice").textContent=msg;$("connectionNotice").className="notice "+type;}}
+function hideMessages(){$("formInfo").classList.add("hidden");$("conflictBox").classList.add("hidden")}
+function conflictSummary(items){return items.map(e=>`• ${esc(e.title)} (${fmtRange(e)})${e.location?" · "+esc(e.location):""}`).join("<br>")}
+function conflictsFor(candidate,excludeId=null){return allEvents().filter(e=>e.googleId!==excludeId&&e.localId!==excludeId&&overlaps(candidate,e))}
+async function findConflicts(candidate,excludeId=null){
+  let remote=[];
+  if(accessToken){const queryEnd=candidate.allDay?(candidate.endDate||addDays(candidate.date,1)):addDays(candidate.endDate||candidate.date,1);remote=await listGoogleRange(candidate.date,queryEnd)}
+  const local=localEvents.filter(e=>e.localId!==excludeId&&overlaps(candidate,e));
+  const remoteConflicts=remote.filter(e=>e.googleId!==excludeId&&overlaps(candidate,e));
+  const ids=new Set(remoteConflicts.map(e=>e.googleId));
+  return [...remoteConflicts,...local.filter(e=>!e.googleId||!ids.has(e.googleId))];
+}
+function formCandidate(){
+  const id=$("eventId").value;
+  const allDay=$("allDay").checked;
+  const lastDay=$("allDayEnd").value||$("date").value;
+  return {localId:id||("local-"+crypto.randomUUID()),title:$("title").value.trim(),date:$("date").value,start:$("start").value,end:$("end").value,endDate:allDay?addDays(lastDay,1):null,allDay,category:$("category").value,reminder:Number($("reminder").value),location:$("location").value.trim(),notes:$("notes").value.trim()};
+}
+async function saveCandidate(e,isEdit){
+  hideMessages();
+  if(!e.title||!e.date)throw new Error("Completa el nombre y la fecha del evento.");
+  if(e.allDay&&e.endDate<=addDays(e.date,0))throw new Error("El último día debe ser igual o posterior a la fecha de inicio.");
+  if(!e.allDay&&e.end<=e.start)throw new Error("La hora de término debe ser posterior a la hora de inicio.");
+  const old=localEvents.find(x=>x.localId===e.localId)||googleEvents.find(x=>x.googleId===e.googleId);
+  const exclude=old?.googleId||old?.localId||null;
+  const conflicts=await findConflicts(e,exclude);
+  if(conflicts.length){$("conflictBox").innerHTML="<b>⚠️ No se guardó: hay un cruce de horario.</b><br>Este compromiso coincide con:<br>"+conflictSummary(conflicts)+"<br><br>Modifica la fecha o el horario y vuelve a intentarlo.";$("conflictBox").classList.remove("hidden");return}
+  if(isEdit&&e.googleId){
+    await apiRequest("/calendars/primary/events/"+encodeURIComponent(e.googleId),{method:"PATCH",body:JSON.stringify(buildGoogleBody(e))});
+    await refreshGoogleEvents();showMessage("Cambios guardados en Google Calendar.","ok");
+  }else if(isEdit&&accessToken){
+    await apiRequest("/calendars/primary/events",{method:"POST",body:JSON.stringify(buildGoogleBody(e))});
+    localEvents=localEvents.filter(x=>x.localId!==e.localId);saveLocal();
+    await refreshGoogleEvents();showMessage("El evento pendiente se creó en Google Calendar.","ok");
+  }else if(isEdit){
+    const index=localEvents.findIndex(x=>x.localId===e.localId);
+    if(index>=0)localEvents[index]=e;else localEvents.push(e);
+    saveLocal();showMessage("Cambios guardados en este dispositivo. Sincroniza cuando conectes Google.","warn");
+  }else if(accessToken){
+    await apiRequest("/calendars/primary/events",{method:"POST",body:JSON.stringify(buildGoogleBody(e))});
+    await refreshGoogleEvents();showMessage("Evento creado en Google Calendar con recordatorio configurado.","ok");
+  }else{
+    localEvents.push(e);
+    saveLocal();showMessage("Evento guardado en este dispositivo. Conecta Google y pulsa «Enviar pendientes» para sincronizarlo.","warn");
+  }
+  resetForm();renderAll();
+}
+function resetForm(){$("eventForm").reset();$("eventId").value="";$("date").value=todayLima();$("allDay").checked=false;$("allDayEnd").value=todayLima();toggleAllDay();$("start").value="09:00";$("end").value="10:00";$("reminder").value="1440";$("formHeading").textContent="＋ Registrar nuevo evento";$("saveBtn").textContent="Guardar evento";$("cancelEdit").classList.add("hidden");hideMessages()}
+$("eventForm").addEventListener("submit",async ev=>{ev.preventDefault();const btn=$("saveBtn");btn.disabled=true;btn.textContent="Comprobando agenda...";try{const id=$("eventId").value;let e=formCandidate();if(id){const old=localEvents.find(x=>x.localId===id)||googleEvents.find(x=>x.googleId===id);if(old){const offset=(!e.allDay&&!old.allDay&&old.endDate)?dayOffset(old.date,old.endDate):0;e={...e,localId:old.localId||id,googleId:old.googleId,endDate:e.allDay?e.endDate:(offset?addDays(e.date,offset):null)}}}await saveCandidate(e,!!id)}catch(e){showMessage(e.message,"error")}finally{btn.disabled=false;btn.textContent=$("eventId").value?"Guardar cambios":"Guardar evento"}});
+$("clearForm").onclick=resetForm;$("cancelEdit").onclick=resetForm;
+window.editEvent=id=>{
+  const e=allEvents().find(x=>x.localId===id||x.googleId===id);if(!e)return;
+  if(e.googleId&&!accessToken){alert("Conecta Google Calendar para editar este evento.");switchTab("settings");return}
+  $("eventId").value=e.localId||e.googleId;$("title").value=e.title;$("date").value=e.date;$("allDay").checked=!!e.allDay;$("allDayEnd").value=e.allDay?addDays(e.endDate||addDays(e.date,1),-1):e.date;toggleAllDay();$("start").value=e.start||"09:00";$("end").value=e.end||"10:00";$("category").value=["Trabajo","Reunión","Evento","Personal","Salud","Otro"].includes(e.category)?e.category:"Otro";$("reminder").value=String(e.reminder||1440);$("location").value=e.location||"";$("notes").value=e.notes||"";$("formHeading").textContent="✎ Editar evento";$("saveBtn").textContent="Guardar cambios";$("cancelEdit").classList.remove("hidden");switchTab("home");window.scrollTo({top:0,behavior:"smooth"});
+};
+window.deleteEvent=async id=>{
+  const e=allEvents().find(x=>x.localId===id||x.googleId===id);if(!e||!confirm(`¿Eliminar "${e.title}"?`))return;
+  try{if(e.googleId){if(!accessToken)throw new Error("Conecta Google Calendar para eliminar este evento.");await apiRequest("/calendars/primary/events/"+encodeURIComponent(e.googleId),{method:"DELETE"});googleEvents=googleEvents.filter(x=>x.googleId!==e.googleId);saveCache()}else{localEvents=localEvents.filter(x=>x.localId!==e.localId);saveLocal()}renderAll();showMessage("Evento eliminado.","ok")}catch(err){alert(err.message)}
+};
+window.openGoogle=id=>{const e=allEvents().find(x=>x.localId===id||x.googleId===id);if(e?.htmlLink)window.open(e.htmlLink,"_blank","noopener");else if(e)window.open("https://calendar.google.com/calendar/u/0/r/day/"+e.date,"_blank","noopener")};
+async function syncPending(){
+  if(!accessToken){showMessage("Conecta Google Calendar primero.","warn");return}
+  const btn=$("syncPending");btn.disabled=true;btn.textContent="Enviando...";
+  let sent=0,blocked=[];
+  try{
+    for(const e of [...localEvents]){
+      const conflicts=await findConflicts(e,e.localId);
+      if(conflicts.length){blocked.push(e.title);continue}
+      await apiRequest("/calendars/primary/events",{method:"POST",body:JSON.stringify(buildGoogleBody(e))});
+      localEvents=localEvents.filter(x=>x.localId!==e.localId);saveLocal();sent++;
+    }
+    await refreshGoogleEvents();renderPending();
+    showMessage(`${sent} evento(s) sincronizado(s).${blocked.length?" No se enviaron por cruces: "+blocked.join(", "):""}` ,blocked.length?"warn":"ok");
+  }catch(e){showMessage(e.message,"error")}
+  finally{btn.disabled=false;btn.textContent="Enviar pendientes"}
+}
+function renderPending(){$("pendingInfo").textContent=localEvents.length?`${localEvents.length} evento(s) guardado(s) solo en este dispositivo, pendientes de enviar a Google.`:"No hay eventos pendientes.";$("syncPending").disabled=!accessToken||!localEvents.length}
+function renderStats(){
+  const list=allEvents().filter(e=>!isPast(e)),now=new Date(),weekEnd=new Date(now.getTime()+7*86400000);
+  $("statTotal").textContent=list.length;
+  $("statWeek").textContent=list.filter(e=>interval(e).s>=now.getTime()&&interval(e).s<=weekEnd.getTime()).length;
+  let c=0;for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++)if(overlaps(list[i],list[j]))c++;$("statConflicts").textContent=c;
+}
+function eventCard(e){
+  const cat=(e.category||"Otro").toLowerCase();const id=e.googleId||e.localId;const source=e.googleId?'<span class="tag google">Google Calendar</span>':'<span class="tag pending">Pendiente de sincronizar</span>';
+  return `<article class="event"><div class="event-bar ${esc(cat)}"></div><div>
+    <div class="event-top"><div class="event-title">${esc(e.title)}</div><span class="tag">${esc(e.category||"Otro")}</span></div>
+    <div class="event-meta">📅 ${dateToText(e.date)}<br>🕒 ${esc(fmtRange(e))}${e.location?`<br>📍 ${esc(e.location)}`:""}</div>${source}
+    ${e.notes?`<div class="event-meta">${esc(e.notes)}</div>`:""}
+    <div class="event-actions">${e.googleId&&e.htmlLink?`<button class="btn secondary small" onclick="openGoogle('${id}')">Abrir en Google</button>`:""}
+      <button class="btn ghost small" onclick="editEvent('${id}')">Editar</button><button class="btn danger small" onclick="deleteEvent('${id}')">Eliminar</button></div>
+  </div></article>`;
+}
+function renderList(target,list,empty){$(target).innerHTML=list.length?list.map(eventCard).join(""):`<div class="empty"><div class="big">🗓️</div>${empty}</div>`}
+function renderUpcoming(){renderList("upcomingList",allEvents().filter(e=>!isPast(e)).slice(0,6),"Todavía no tienes eventos próximos.")}
+function eventTouchesDate(e,ds){const day={date:ds,start:"00:00",end:"23:59",allDay:false};const a=interval(e),b={s:new Date(localISO(ds,"00:00")).getTime(),e:new Date(localISO(addDays(ds,1),"00:00")).getTime()};return a.s<b.e&&a.e>b.s}
+function renderCalendar(){
+  const y=monthCursor.getFullYear(),m=monthCursor.getMonth();$("monthTitle").textContent=new Intl.DateTimeFormat("es-PE",{month:"long",year:"numeric",timeZone:TZ}).format(new Date(Date.UTC(y,m,1,12)));
+  const first=new Date(y,m,1),offset=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prevDays=new Date(y,m,0).getDate(),today=todayLima();let html="";
+  for(let i=0;i<42;i++){let day,d,muted=false;if(i<offset){day=prevDays-offset+i+1;d=new Date(y,m-1,day);muted=true}else if(i>=offset+days){day=i-offset-days+1;d=new Date(y,m+1,day);muted=true}else{day=i-offset+1;d=new Date(y,m,day)}const ds=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,has=allEvents().some(e=>eventTouchesDate(e,ds));html+=`<button class="day ${muted?"muted":""} ${ds===today?"today":""} ${ds===dateKey(selectedDate)?"selected":""}" onclick="selectDay('${ds}')">${day}${has?'<span class="dot"></span>':""}</button>`}
+  $("monthGrid").innerHTML=html;
+}
+function dateKey(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function renderDay(){const ds=dateKey(selectedDate),list=allEvents().filter(e=>eventTouchesDate(e,ds));$("selectedDateTitle").textContent="Eventos · "+dateToText(ds);renderList("dayList",list,"No hay compromisos para esta fecha.")}
+window.selectDay=ds=>{selectedDate=new Date(ds+"T12:00:00");renderCalendar();renderDay()};
+function renderAll(){
+  renderStats();renderUpcoming();renderCalendar();renderDay();
+  const q=($("searchBox")?.value||"").toLowerCase();const list=allEvents().filter(e=>[e.title,e.location,e.category,e.notes].join(" ").toLowerCase().includes(q));renderList("allList",list,"No hay eventos que mostrar.");renderPending();updateLastSync();
+}
+function switchTab(tab){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));["home","calendar","events","settings"].forEach(v=>$ (v+"View").classList.toggle("hidden",v!==tab));if(tab==="events")renderAll()}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+$("prevMonth").onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()-1);renderCalendar()};$("nextMonth").onclick=()=>{monthCursor.setMonth(monthCursor.getMonth()+1);renderCalendar()};$("seeAll").onclick=()=>switchTab("events");$("searchBox").addEventListener("input",renderAll);
+$("saveClient").onclick=()=>{const v=$("clientId").value.trim();if(!v.endsWith(".apps.googleusercontent.com")){alert("Pega un ID de cliente OAuth válido que termine en .apps.googleusercontent.com");return}localStorage.setItem(CLIENT_KEY,v);$("connectionNotice").textContent="ID de cliente guardado. Ahora pulsa «Conectar con Google».";showMessage("ID de cliente guardado en este dispositivo.","ok")};
+$("clientId").value=localStorage.getItem(CLIENT_KEY)||"";
+$("connectGoogle").onclick=connectGoogle;
+$("syncGoogle").onclick=async()=>{try{$("syncGoogle").disabled=true;await refreshGoogleEvents();showMessage("Agenda actualizada desde Google Calendar.","ok")}catch(e){showMessage(e.message,"error")}finally{$("syncGoogle").disabled=!accessToken}};
+$("disconnectGoogle").onclick=()=>{if(accessToken&&window.google?.accounts?.oauth2){google.accounts.oauth2.revoke(accessToken,()=>{})}accessToken=null;tokenExpiresAt=0;setStatus(false);renderAll();showMessage("Se desconectó la sesión de esta aplicación. Los eventos siguen en tu Google Calendar.","warn")};
+$("syncPending").onclick=syncPending;
+function toggleAllDay(){const v=$("allDay").checked;$("start").disabled=v;$("end").disabled=v;$("allDayEndWrap").classList.toggle("hidden",!v);if(v){$("start").required=false;$("end").required=false;if(!$("allDayEnd").value)$("allDayEnd").value=$("date").value}else{$("start").required=true;$("end").required=true}}
+$("allDay").addEventListener("change",toggleAllDay);
+$("date").addEventListener("change",()=>{if($("allDay").checked&&(!$("allDayEnd").value||$("allDayEnd").value<$("date").value))$("allDayEnd").value=$("date").value});
+$("date").value=todayLima();$("allDayEnd").value=todayLima();toggleAllDay();setStatus(false);renderAll();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
